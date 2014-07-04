@@ -1,0 +1,103 @@
+# cl-voxelize
+
+Cl-voxelize is a library to convert polygon models into voxel models for particle-based physics simulation.
+
+## Example
+
+Here shows an example of how to use cl-voxelize. With the Stanford bunny's ply file, I illustrate how to load, voxelize and visualize it.
+
+As an example data, use the Stanford bunny's ply file from [the Stanford 3D Scanning Repository](https://graphics.stanford.edu/data/3Dscanrep/). Since the voxelization algorithm I adopt does not work well for polygon model with holes, I use Stanfords's [Volfill](http://graphics.stanford.edu/software/volfill/) tool for hole filling. Additionally, I simplify the model with [QSlim](http://www.cs.cmu.edu/afs/cs/Web/People/garland/quadrics/qslim.html) for reducing voxelization time. This simplification make no effect on the result voxels in this case, because relatively coarse resolution is enough for particle-based simulation. A hole-filled and simplified Stanford bunny's ply file is placed in this repository.
+
+A hole-filled and simplified Stanford bunny in PLY format:
+* https://github.com/takagi/cl-voxelize/dummy
+
+Read the Stanford bunny's .ply file and convert it to a list of triangles which is input to `voxelize` function.
+
+    (defun make-triangles (vertices faces)
+      (let (ret)
+        (dotimes (i (array-dimension faces 0))
+          (let ((face (aref faces i)))
+            (let ((v0 (aref vertices (nth face 0)))
+                  (v1 (aref vertices (nth face 1)))
+                  (v2 (aref vertices (nth face 2))))
+              (push (list v0 v1 v2) ret))))
+        ret))
+    
+    (defun ply-to-triangles (path)
+      (cl-ply:with-ply-file (ply path)
+        (let ((vertex-element (cl-ply:plyfile-element ply "vertex"))
+              (face-element (cl-ply:plyfile-element ply "face")))
+          (let ((vertices (make-array (cl-ply:element-size vertex-element)))
+                (faces (make-array (cl-ply:element-size face-element))))
+            ;; read vertices
+            (cl-ply:do-ply-elements ((i x y z) ply)
+              (setf (aref vertices i) (list x y z)))
+            ;; read faces
+            (cl-ply:do-ply-elements ((i indices) ply)
+              (setf (aref faces i) indices))
+            ;; get triangles from vertices and faces
+            (triangles vertices faces)))))
+    
+    (ply-to-triangles "/path/to/bunny.ply")
+
+Voxelize the obtained triangles and get voxels as the result. The voxels are represented as a list of their center points.
+
+    (let ((triangles (ply-to-triangles "/path/to/bunny.ply"))
+          (delta ...))
+      (voxelize triangles delta))
+
+As an illustration, I show you the result voxels rendered with POV-Ray.
+
+    ** Here some images with different deltas inserted **
+
+## Installation
+
+Since cl-voxelize is just requesting its approval to Quicklisp, please use its local-projects feature until it will be approved.
+
+    $ cd quicklisp/local-projects
+    $ git clone git://github.com/takagi/cl-voxelize.git
+
+You can install cl-voxelize via Quicklisp after approved:
+
+    (ql:quicklisp :cl-voxelize)
+
+## API
+
+### [Function] voxelize
+
+    VOXELIZE triangle-list delta &optional antialias-p => voxel-list
+
+Returns `voxel-list` with given `triangle-list`. `delta` is a floating point which specifies the resolution of voxels. `voxel-list` is represented as a list of voxels' center points. If `antialias-p` is true, the result is antialiased.
+
+### [Macro] with-voxelize
+
+    WITH-VOXELIZE ((x y z) triangle-list delta &optional antialias-p) &body body => result
+
+`with-voxelize` is a `voxelize`'s counterpart in `with-` context style. Voxels' center points are bound to `x`, `y` and `z` symbols.
+
+## FAQ
+
+Q.What are tools used to make the Stanford bunny's ply file in Example section?
+
+A. Tools I used were following:
+* [ply2vri](http://grail.cs.washington.edu/software-data/ply2vri/) - a simple command line tool for converting triangle meshes in PLY format into signed-distance volumetric grids in VRI format
+* [Volfill](http://graphics.stanford.edu/software/volfill/) - a program for filling in holes in dense polygon meshes using an algorithm based on volumetric diffusion
+* [VRIP](http://graphics.stanford.edu/software/vrip/) - to convert a VRI file to a new triangle mesh in PLY format using the embedding implementation of Marching Cubes 
+* [QSlim](http://www.cs.cmu.edu/afs/cs/Web/People/garland/quadrics/qslim.html) - a program to simplify polygon model with QEM(Quadratic Error Metric)
+* [Blender](http://www.blender.org/) - just for converting PLY format from/to OBJ format to apply QSlim
+
+## Reference
+
+* S. Thon, G. Gresquiere, and R. Raffin. "A low cost antialiased space filled voxelization of polygonal objects."
+
+## Author
+
+* Masayuki Takagi (kamonama@gmail.com)
+
+## Copyright
+
+Copyright (c) 2014 Masayuki Takagi (kamonama@gmail.com)
+
+## License
+
+Licensed under the LLGPL License.
