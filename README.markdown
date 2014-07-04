@@ -13,7 +13,7 @@ A hole-filled and simplified Stanford bunny in PLY format:
 
 Read the Stanford bunny's .ply file and convert it to a list of triangles which is input to `voxelize` function.
 
-    (defun make-triangles (vertices faces)
+    (defun triangles (vertices faces)
       (let (ret)
         (dotimes (i (array-dimension faces 0))
           (let ((face (aref faces i)))
