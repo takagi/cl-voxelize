@@ -69,11 +69,11 @@ You can install cl-voxelize via Quicklisp after approved:
 
 Returns `voxel-list` with given `triangle-list`. `delta` is a floating point which specifies the resolution of voxels. `voxel-list` is represented as a list of voxels' center points. If `antialias-p` is true, the result is antialiased.
 
-### [Macro] with-voxelize
+### [Macro] do-voxelize
 
-    WITH-VOXELIZE ((x y z) triangle-list delta &optional antialias-p) &body body => result
+    DO-VOXELIZE ((x y z) triangle-list delta &optional antialias-p) &body body => result
 
-`with-voxelize` is a `voxelize`'s counterpart in `with-` context style. Voxels' center points are bound to `x`, `y` and `z` symbols.
+`do-voxelize` is a `voxelize`'s counterpart in `do-` style. Voxels' center points are bound to `x`, `y` and `z` symbols.
 
 ## FAQ
 
