@@ -77,7 +77,19 @@ Returns `voxel-list` with given `triangle-list`. `delta` is a floating point whi
 
 ## FAQ
 
-Q.What are tools used to make the Stanford bunny's ply file in Example section?
+**Q. What are file formats to be voxelized?**
+
+A. Any file formats are supported as far as they can be converted to fit cl-voxelize's API interface.
+
+**Q. How large polygon model? How long does it take to voxelize?**
+
+A. Currently I do not set performance goal because relatively coarse resolution is enough for particle-based simulation.
+
+**Q. Are there any restrictions for polygon models to be voxelized?**
+
+A. The voxelization algorithm I adopt does not work well for polygon models with holes.
+
+**Q. What are tools used to make the Stanford bunny's ply file in Example section?**
 
 A. Tools I used were following:
 * [ply2vri](http://grail.cs.washington.edu/software-data/ply2vri/) - a simple command line tool for converting triangle meshes in PLY format into signed-distance volumetric grids in VRI format
