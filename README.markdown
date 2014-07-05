@@ -51,7 +51,7 @@ Voxelize the obtained triangles and get voxels as the result. The voxels are rep
 
 As an illustration, I show you the result voxels rendered with POV-Ray.
 
-![Voxelized Stanford bunny](https://github.com/takagi/cl-voxelize/blob/master/examples/bunny.png)
+![Voxelized Stanford bunny](https://raw.githubusercontent.com/takagi/cl-voxelize/master/examples/bunny.png)
 
 ## Installation
 
