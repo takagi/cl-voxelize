@@ -217,13 +217,13 @@
               nil))))))
 
 (defun inside-p (x y z triangles)
-  ;; need removing duplication?
   (oddp
     (length
       (remove-if-not (curry #'> z)
-        (remove nil
-          (mapcar (curry #'intersection-z x y)
-            triangles))))))
+        (remove-duplicates
+          (remove nil
+            (mapcar (curry #'intersection-z x y)
+              triangles)))))))
 
 (defun voxelize (triangles delta)
   (let ((qt (quadtree triangles))

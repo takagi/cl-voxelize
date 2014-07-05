@@ -128,8 +128,8 @@
                    ((0.0 0.0 0.0) (0.0 1.0 0.0) (0.0 1.0 1.0))
                    ((1.0 0.0 0.0) (1.0 0.0 1.0) (1.0 1.0 0.0))
                    ((1.0 0.0 1.0) (1.0 1.0 1.0) (1.0 1.0 0.0)))))
-  (is (length (voxelize triangles 0.33))
-      27 "basic case 1"))
+  (is (length (voxelize triangles 0.5))
+      8 "basic case 1"))
 
 
 (finalize)
