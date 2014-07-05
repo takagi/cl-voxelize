@@ -9,11 +9,12 @@ Here shows an example of how to use cl-voxelize. With the Stanford bunny's ply f
 As an example data, use the Stanford bunny's ply file from [the Stanford 3D Scanning Repository](https://graphics.stanford.edu/data/3Dscanrep/). Since the voxelization algorithm I adopt does not work well for polygon model with holes, I use Stanfords's [Volfill](http://graphics.stanford.edu/software/volfill/) tool for hole filling. Additionally, I simplify the model with [QSlim](http://www.cs.cmu.edu/afs/cs/Web/People/garland/quadrics/qslim.html) for reducing voxelization time. This simplification make no effect on the result voxels in this case, because relatively coarse resolution is enough for particle-based simulation. A hole-filled and simplified Stanford bunny's ply file is placed in this repository.
 
 A hole-filled and simplified Stanford bunny in PLY format:
-* https://github.com/takagi/cl-voxelize/dummy
+* https://github.com/takagi/cl-voxelize/blob/master/examples/bunny.ply
 
 Read the Stanford bunny's .ply file and convert it to a list of triangles which is input to `voxelize` function.
 
     (defun triangles (vertices faces)
+      ;; make a list of triangles from vertex array and face array
       (let (ret)
         (dotimes (i (array-dimension faces 0))
           (let ((face (aref faces i)))
@@ -24,31 +25,33 @@ Read the Stanford bunny's .ply file and convert it to a list of triangles which 
         ret))
     
     (defun ply-to-triangles (path)
-      (cl-ply:with-ply-file (ply path)
-        (let ((vertex-element (cl-ply:plyfile-element ply "vertex"))
-              (face-element (cl-ply:plyfile-element ply "face")))
-          (let ((vertices (make-array (cl-ply:element-size vertex-element)))
-                (faces (make-array (cl-ply:element-size face-element))))
+      (cl-ply:with-plyfile (ply path)
+        (let ((vertex-element (cl-ply::plyfile-element ply "vertex"))
+              (face-element (cl-ply::plyfile-element ply "face")))
+          (let ((vertices (make-array (cl-ply::element-size vertex-element)))
+                (faces (make-array (cl-ply::element-size face-element))))
             ;; read vertices
-            (cl-ply:do-ply-elements ((i x y z) ply)
-              (setf (aref vertices i) (list x y z)))
+            (let ((idx 0))
+              (cl-ply:with-ply-element ((x y z c) "vertex" ply)
+                (setf (aref vertices idx) (list x y z))
+                (incf idx)))
             ;; read faces
-            (cl-ply:do-ply-elements ((i indices) ply)
-              (setf (aref faces i) indices))
+            (let ((idx 0))
+              (cl-ply:with-ply-element (indices "face" ply)
+                (setf (aref faces idx) indices)
+                (incf idx)))
             ;; get triangles from vertices and faces
             (triangles vertices faces)))))
-    
-    (ply-to-triangles "/path/to/bunny.ply")
 
 Voxelize the obtained triangles and get voxels as the result. The voxels are represented as a list of their center points.
 
     (let ((triangles (ply-to-triangles "/path/to/bunny.ply"))
-          (delta ...))
+          (delta 0.0045))
       (voxelize triangles delta))
 
 As an illustration, I show you the result voxels rendered with POV-Ray.
 
-    ** Here some images with different deltas inserted **
+![Voxelized Stanford bunny](https://github.com/takagi/cl-voxelize/blob/master/examples/bunny.png)
 
 ## Installation
 

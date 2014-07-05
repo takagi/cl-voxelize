@@ -12,7 +12,7 @@
   :version "0.1"
   :author "Masayuki Takagi"
   :license "LLGPL"
-  :depends-on ()
+  :depends-on (:alexandria)
   :components ((:module "src"
                 :components
                 ((:file "cl-voxelize"))))
