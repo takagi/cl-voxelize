@@ -68,13 +68,13 @@ You can install cl-voxelize via Quicklisp after approved:
 
 ### [Function] voxelize
 
-    VOXELIZE triangle-list delta &optional antialias-p => voxel-list
+    VOXELIZE triangles delta &optional antialias-p => voxels
 
-Returns `voxel-list` with given `triangle-list`. `delta` is a floating point which specifies the resolution of voxels. `voxel-list` is represented as a list of voxels' center points. If `antialias-p` is true, the result is antialiased.
+Returns `voxels` with given `triangles` which is a list of triangles. `delta` is a floating point which specifies the resolution of voxels. `voxels` is represented as a list of voxels' center points. If `antialias-p` is true, the result is antialiased.
 
 ### [Macro] do-voxelize
 
-    DO-VOXELIZE ((x y z) triangle-list delta &optional antialias-p) &body body => result
+    DO-VOXELIZE ((x y z) triangles delta &optional antialias-p) &body body => result
 
 `do-voxelize` is a `voxelize`'s counterpart in `do-` style. Voxels' center points are bound to `x`, `y` and `z` symbols.
 
