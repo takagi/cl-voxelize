@@ -6,7 +6,8 @@
 (in-package :cl-user)
 (defpackage cl-voxelize
   (:use :cl)
-  (:export :voxelize)
+  (:export :voxelize
+           :do-voxelize)
   (:import-from :alexandria
                 :curry))
 (in-package :cl-voxelize)
@@ -227,16 +228,26 @@
             (mapcar (curry #'intersection-z x y)
               triangles)))))))
 
-(defun voxelize (triangles delta)
+(defun %do-voxelize (fn triangles delta)
   (let ((qt (quadtree triangles))
         (delta2 (/ delta 2.0)))
-    (let (ret)
-      (destructuring-bind (x0 y0 z0 x1 y1 z1)
-          (triangles-bounding-box triangles)
-        (loop for y = (+ y0 delta2) then (+ y delta) while (< y y1) do
-          (loop for x = (+ x0 delta2) then (+ x delta) while (< x x1)
-             do (let ((triangles0 (query-quadtree qt x y)))
-                  (loop for z = (+ z0 delta2) then (+ z delta) while (< z z1)
-                     if (inside-p x y z triangles0)
-                     do (push (list x y z) ret))))))
-      ret)))
+    (destructuring-bind (x0 y0 z0 x1 y1 z1)
+        (triangles-bounding-box triangles)
+      (loop for y = (+ y0 delta2) then (+ y delta) while (< y y1) do
+         (loop for x = (+ x0 delta2) then (+ x delta) while (< x x1)
+            do (let ((triangles0 (query-quadtree qt x y)))
+                 (loop for z = (+ z0 delta2) then (+ z delta) while (< z z1)
+                    if (inside-p x y z triangles0)
+                    do (funcall fn x y z))))))))
+
+(defmacro do-voxelize (((x y z) triangles delta) &body body)
+  `(%do-voxelize #'(lambda (,x ,y ,z)
+                     ,@body)
+                 ,triangles
+                 ,delta))
+
+(defun voxelize (triangles delta)
+  (let (ret)
+    (do-voxelize ((x y z) triangles delta)
+      (push (list x y z) ret))
+    ret))
