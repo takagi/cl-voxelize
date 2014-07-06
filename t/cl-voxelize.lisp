@@ -11,6 +11,7 @@
   (:import-from :cl-voxelize
                 :triangle-intersect-p
                 :quadtree
+                :intersection-z
                 :point-intersect-p
                 :query-quadtree))
 (in-package :cl-voxelize-test)
@@ -46,16 +47,32 @@
 
 
 ;;;
+;;; test INTERSECTION-Z function
+;;;
+
+(diag "INTERSECTION-Z")
+
+(is (intersection-z 0.25 0.25 '((0.0 0.0 1.0) (1.0 0.0 1.0) (0.0 1.0 1.0)))
+    1.0 "basic case 1 - a ray intersects with a triangle")
+
+(is (intersection-z 0.75 0.75 '((0.0 0.0 1.0) (1.0 0.0 1.0) (0.0 1.0 1.0)))
+    nil "basic case 2 - a ray does not intersect with a triangle")
+
+(is (intersection-z 0.0 0.0 '((0.0 0.0 0.0) (0.0 1.0 0.0) (0.0 0.0 1.0)))
+    nil "basic case 3 - a triangle parallel to z-axis")
+
+
+;;;
 ;;; test POINT-INTERSECT-P function
 ;;;
 
 (diag "POINT-INTERSECT-P")
 
 (is (point-intersect-p '(0.0 0.0 2.0 2.0) 1.0 1.0)
-    t "basic case 1")
+    t "basic case 1 - a point intersects with a boundary rectangular")
 
 (is (point-intersect-p '(0.0 0.0 2.0 2.0) -1.0 -1.0)
-    nil "basic case 2")
+    nil "basic case 2 - a point does not intersect with a boundary rect.")
 
 
 ;;;
