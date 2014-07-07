@@ -45,6 +45,9 @@
   `(destructuring-bind ((,x0 ,y0 ,z0)
                         (,x1 ,y1 ,z1)
                         (,x2 ,y2 ,z2)) ,triangle
+     (declare (single-float ,x0 ,y0 ,z0))
+     (declare (single-float ,x1 ,y1 ,z1))
+     (declare (single-float ,x2 ,y2 ,z2))
      ,@body))
 
 (defun triangle-bounding-box (triangle)
@@ -69,7 +72,7 @@
   boundary
   depth)
 
-(defvar *max-depth* 2)
+(defvar *max-depth* 3)
 
 (defvar *max-capacity* 8)
 
@@ -103,8 +106,8 @@
   (unless (quadtree-leaf-p quadtree)
     (error "The quadtree ~A must be a leaf to be devided." quadtree))
   (destructuring-bind (x0 y0 x1 y1) (quadtree-boundary quadtree)
-    (let ((xmid (/ (- x1 x0) 2.0))
-          (ymid (/ (- y1 y0) 2.0))
+    (let ((xmid (/ (+ x1 x0) 2.0))
+          (ymid (/ (+ y1 y0) 2.0))
           (depth (1+ (quadtree-depth quadtree))))
       (setf (quadtree-nw quadtree) (%empty-quadtree x0 ymid xmid y1 depth)
             (quadtree-ne quadtree) (%empty-quadtree xmid ymid x1 y1 depth)
@@ -198,6 +201,8 @@
 ;;;
 
 (defun intersection-z (x y triangle)
+  (declare (optimize (speed 3) (safety 0)))
+  (declare (single-float x y))
   (with-triangle ((x0 y0 z0)
                   (x1 y1 z1)
                   (x2 y2 z2)) triangle
@@ -219,14 +224,17 @@
                   nil))
             nil)))))
 
-(defun inside-p (x y z triangles)
+(defun intersections-z (x y triangles)
+  (remove-duplicates
+    (remove nil
+      (mapcar (curry #'intersection-z x y)
+        triangles))))
+
+(defun inside-p (z intersections-z)
   (oddp
     (length
       (remove-if-not (curry #'> z)
-        (remove-duplicates
-          (remove nil
-            (mapcar (curry #'intersection-z x y)
-              triangles)))))))
+        intersections-z))))
 
 (defun %do-voxelize (fn triangles delta)
   (let ((qt (quadtree triangles))
@@ -235,9 +243,10 @@
         (triangles-bounding-box triangles)
       (loop for y = (+ y0 delta2) then (+ y delta) while (< y y1) do
          (loop for x = (+ x0 delta2) then (+ x delta) while (< x x1)
-            do (let ((triangles0 (query-quadtree qt x y)))
+            do (let* ((triangles0 (query-quadtree qt x y))
+                      (intersections-z (intersections-z x y triangles0)))
                  (loop for z = (+ z0 delta2) then (+ z delta) while (< z z1)
-                    if (inside-p x y z triangles0)
+                    if (inside-p z intersections-z)
                     do (funcall fn x y z))))))))
 
 (defmacro do-voxelize (((x y z) triangles delta) &body body)

@@ -123,7 +123,8 @@
                       ((0.0 0.0 0.0) (1.0 0.0 0.0) (0.0 0.87 0.0))
                       ((0.0 0.0 0.0) (1.0 0.0 0.0) (0.0 0.88 0.0))))))
   (is (cl-voxelize::quadtree-depth (cl-voxelize::quadtree-nw
-                                     (cl-voxelize::quadtree-nw qt)))
+                                     (cl-voxelize::quadtree-nw
+                                       (cl-voxelize::quadtree-nw qt))))
       cl-voxelize::*max-depth* "basic case 6"))
 
 
