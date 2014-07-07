@@ -92,6 +92,18 @@ A. Currently I do not set performance goal because relatively coarse resolution 
 
 A. The voxelization algorithm I adopt does not work well for polygon models with holes.
 
+**Q. In a quadtree used in this implementation, how is a triangle which intersects with multiple sub-quadtrees treated?**
+
+A. There are roughly two options how to treat a triangle which intersects with multiple sub-quadtrees:
+* A triangle belongs to all sub-quadtrees with which it intersects
+* A triangle belongs to only one of sub-quadtrees with which it intersects
+
+To properly determine inside/outside in this case, I choose the former.
+
+**Q. If a ray goes on a shared side of triangles through, is inside/outside rightly determined?**
+
+A. To determine inside/outside in such case, duplicated intersections are removed.
+
 **Q. What are tools used to make the Stanford bunny's ply file in Example section?**
 
 A. Tools I used were following:
