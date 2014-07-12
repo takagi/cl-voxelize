@@ -26,20 +26,20 @@
 
 (defun ply-to-triangles (path)
   (cl-ply:with-plyfile (ply path)
-    (let ((vertex-element (cl-ply::plyfile-element ply "vertex"))
-          (face-element (cl-ply::plyfile-element ply "face")))
-      (let ((vertices (make-array (cl-ply::element-size vertex-element)))
-            (faces (make-array (cl-ply::element-size face-element))))
+    (let ((vertex-size (cl-ply:plyfile-element-size ply "vertex"))
+          (face-size (cl-ply:plyfile-element-size ply "face")))
+      (let ((vertices (make-array vertex-size))
+            (faces (make-array face-size)))
         ;; read vertices
-        (let ((idx 0))
-          (cl-ply:with-ply-element ((x y z) "vertex" ply)
-            (setf (aref vertices idx) (list x y z))
-            (incf idx)))
+        (loop repeat vertex-size
+              for i from 0
+           do (cl-ply:with-ply-element ((x y z) ply)
+                (setf (aref vertices i) (list x y z))))
         ;; read faces
-        (let ((idx 0))
-          (cl-ply:with-ply-element (indices "face" ply)
-            (setf (aref faces idx) indices)
-            (incf idx)))
+        (loop repeat face-size
+              for i from 0
+           do (cl-ply:with-ply-element (vertex-index ply)
+                (setf (aref faces i) vertex-index)))
         ;; get triangles from vertices and faces
         (triangles vertices faces)))))
 
