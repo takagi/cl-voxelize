@@ -120,16 +120,6 @@
               (insert-quadtree (quadtree-sw quadtree) triangle)
               (insert-quadtree (quadtree-se quadtree) triangle))))))
 
-;; (defun triangle-small-enough-p (quadtree triangle)
-;;   (destructuring-bind (x0 y0 x1 y1) (quadtree-boundary quadtree)
-;;     (let ((criteria-x (/ (- x1 x0) (expt 2 *max-depth*) 2))
-;;           (criteria-y (/ (- y1 y0) (expt 2 *max-depth*) 2)))
-;;       (destructuring-bind (tx0 ty0 tz0 tx1 ty1 tz1)
-;;           (triangle-bounding-box triangle)
-;;         (declare (ignore tz0 tz1))
-;;         (and (<= (- tx1 tx0) criteria-x)
-;;              (<= (- ty1 ty0) criteria-y))))))
-
 (defun triangle-intersect-p (boundary triangle)
   (destructuring-bind (x0 y0 x1 y1) boundary
     (destructuring-bind (tx0 ty0 tz0 tx1 ty1 tz1)
@@ -143,8 +133,6 @@
   (some #'identity args))
 
 (defun insert-quadtree (quadtree triangle)
-;;   (unless (triangle-small-enough-p quadtree triangle)
-;;     (warn "The triangle ~A is not small enough." triangle))
   (cond
     ((not (triangle-intersect-p (quadtree-boundary quadtree) triangle))
      nil)
