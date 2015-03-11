@@ -25,23 +25,21 @@
     ret))
 
 (defun ply-to-triangles (path)
-  (cl-ply:with-plyfile (ply path)
-    (let ((vertex-size (cl-ply:plyfile-element-size ply "vertex"))
-          (face-size (cl-ply:plyfile-element-size ply "face")))
-      (let ((vertices (make-array vertex-size))
-            (faces (make-array face-size)))
-        ;; read vertices
-        (loop repeat vertex-size
-              for i from 0
-           do (cl-ply:with-ply-element ((x y z) ply)
-                (setf (aref vertices i) (list x y z))))
-        ;; read faces
-        (loop repeat face-size
-              for i from 0
-           do (cl-ply:with-ply-element (vertex-index ply)
-                (setf (aref faces i) vertex-index)))
-        ;; get triangles from vertices and faces
-        (triangles vertices faces)))))
+  (cl-ply:with-ply-for-reading (plyfile path)
+    (let ((vertices (make-array (cl-ply:ply-element-size plyfile "vertex")))
+          (faces (make-array (cl-ply:ply-element-size plyfile "face"))))
+      ;; read vertices
+      (loop repeat (array-dimension vertices 0)
+            for i from 0
+         do (setf (aref vertices i)
+                  (cl-ply:ply-read-element plyfile "vertex")))
+      ;; read faces
+      (loop repeat (array-dimension faces 0)
+            for i from 0
+         do (setf (aref faces i)
+                  (car (cl-ply:ply-read-element plyfile "face"))))
+      ;; get triangles from vertices and faces
+      (triangles vertices faces))))
 
 
 ;;;
