@@ -25,23 +25,21 @@ Read the Stanford bunny's .ply file and convert it to a list of triangles which 
         ret))
     
     (defun ply-to-triangles (path)
-      (cl-ply:with-plyfile (ply path)
-        (let ((vertex-element (cl-ply::plyfile-element ply "vertex"))
-              (face-element (cl-ply::plyfile-element ply "face")))
-          (let ((vertices (make-array (cl-ply::element-size vertex-element)))
-                (faces (make-array (cl-ply::element-size face-element))))
-            ;; read vertices
-            (let ((idx 0))
-              (cl-ply:with-ply-element ((x y z c) "vertex" ply)
-                (setf (aref vertices idx) (list x y z))
-                (incf idx)))
-            ;; read faces
-            (let ((idx 0))
-              (cl-ply:with-ply-element (indices "face" ply)
-                (setf (aref faces idx) indices)
-                (incf idx)))
-            ;; get triangles from vertices and faces
-            (triangles vertices faces)))))
+      (cl-ply:with-ply-for-reading (plyfile path)
+        (let ((vertices (make-array (cl-ply:ply-element-size plyfile "vertex")))
+              (faces (make-array (cl-ply:ply-element-size plyfile "face"))))
+          ;; read vertices
+          (loop repeat (array-dimension vertices 0)
+                for i from 0
+             do (setf (aref vertices i)
+                      (cl-ply:ply-read-element plyfile "vertex")))
+          ;; read faces
+          (loop repeat (array-dimension faces 0)
+                for i from 0
+             do (setf (aref faces i)
+                      (car (cl-ply:ply-read-element plyfile "face"))))
+          ;; get triangles from vertices and faces
+          (triangles vertices faces))))
 
 Voxelize the obtained triangles and get voxels as the result. The voxels are represented as a list of their center points.
 
@@ -55,14 +53,9 @@ As an illustration, I show you the result voxels rendered with POV-Ray.
 
 ## Installation
 
-Since cl-voxelize is just requesting its approval to Quicklisp, please use its local-projects feature until it will be approved.
+You can install cl-voxelize via Quicklisp:
 
-    $ cd quicklisp/local-projects
-    $ git clone git://github.com/takagi/cl-voxelize.git
-
-You can install cl-voxelize via Quicklisp after approved:
-
-    (ql:quicklisp :cl-voxelize)
+    (ql:quickload :cl-voxelize)
 
 ## API
 
