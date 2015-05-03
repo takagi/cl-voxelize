@@ -15,6 +15,6 @@ before_script:
 
 script:
   - cl -l prove -l cl-coveralls
-       -e '(or (coveralls:with-coveralls (:exclude "t")
+       -e '(or (coveralls:with-coveralls (:exclude "t" "examples/bunny.lisp")
                  (prove:run :cl-voxelize-test))
                (uiop:quit -1))'
