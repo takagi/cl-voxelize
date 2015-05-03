@@ -12,8 +12,11 @@
   :author "Masayuki Takagi"
   :license "LLGPL"
   :depends-on (:cl-voxelize
-               :cl-test-more)
+               :prove)
   :components ((:module "t"
                 :components
-                ((:file "cl-voxelize"))))
-  :perform (load-op :after (op c) (asdf:clear-system c)))
+                ((:test-file "cl-voxelize"))))
+  :defsystem-depends-on (:prove-asdf)
+  :perform (test-op :after (op c)
+                    (funcall (intern #.(string :run-test-system) :prove.asdf) c)
+                    (asdf:clear-system c)))

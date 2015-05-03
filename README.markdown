@@ -1,5 +1,8 @@
 # cl-voxelize
 
+[![Build Status](https://travis-ci.org/takagi/cl-voxelize.svg)](https://travis-ci.org/takagi/cl-voxelize)
+[![Coverage Status](https://coveralls.io/repos/takagi/cl-voxelize/badge.svg)](https://coveralls.io/r/takagi/cl-voxelize)
+
 Cl-voxelize is a library to convert polygon models into voxel models for particle-based physics simulation.
 
 ## Example

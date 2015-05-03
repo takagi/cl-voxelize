@@ -7,7 +7,7 @@
 (defpackage cl-voxelize-test
   (:use :cl
         :cl-voxelize
-        :cl-test-more)
+        :prove)
   (:import-from :cl-voxelize
                 :triangle-intersect-p
                 :quadtree
