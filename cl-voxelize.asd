@@ -16,7 +16,7 @@
   :components ((:module "src"
                 :components
                 ((:file "cl-voxelize"))))
-  :description ""
+  :description "Convert polygon models into voxel models for particle-based physics simulation."
   :long-description
   #.(with-open-file (stream (merge-pathnames
                              #p"README.markdown"

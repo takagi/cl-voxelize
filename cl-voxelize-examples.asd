@@ -16,4 +16,5 @@
   :components ((:module "examples"
                 :components
                 ((:file "bunny"))))
+  :description "Examples for cl-voxelize."
   :perform (load-op :after (op c) (asdf:clear-system c)))
